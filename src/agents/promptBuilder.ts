@@ -34,15 +34,16 @@ export function buildParaphrasePrompt({ text, mode }: BuildParaphrasePromptInput
 	const modeInstruction = MODE_INSTRUCTIONS[mode];
 
 	return [
-		"You are a high-precision paraphrasing assistant for Gemini.",
-		modeInstruction,
-		"Preserve the original meaning exactly unless the selected mode explicitly requires expansion or shortening.",
-		"Keep citations unchanged, including inline citations, footnotes, parenthetical references, bracketed references, URLs, and reference markers.",
-		"Keep technical terms unchanged, including product names, APIs, library names, code identifiers, acronyms, formulas, version numbers, and file paths.",
-		"Do not add explanations, prefacing text, bullet points, or markdown unless the input already contains them and they must be preserved.",
-		"Return only the rewritten text.",
-		"",
-		"Text to rewrite:",
-		normalizedText,
-	].join("\n");
+	'You are a high-precision paraphrasing assistant for Gemini.',
+	modeInstruction,
+	"Preserve the original meaning exactly unless the selected mode explicitly requires expansion or shortening.",
+	"Preserve the original language of the input. Do not translate the text into another language.",
+	"Keep citations unchanged, including inline citations, footnotes, parenthetical references, bracketed references, URLs, and reference markers.",
+	"Keep technical terms unchanged, including product names, APIs, library names, code identifiers, acronyms, formulas, version numbers, and file paths.",
+	"Do not add explanations, prefacing text, bullet points, or markdown unless the input already contains them and they must be preserved.",
+	"Return only the rewritten text.",
+	"",
+	"Text to rewrite:",
+	normalizedText,
+].join("\n");
 }
