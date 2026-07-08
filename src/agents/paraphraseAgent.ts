@@ -14,7 +14,7 @@ import type {
 	StandardizedParaphraseResponse,
 } from "../types/api";
 
-const DEFAULT_GEMINI_MODEL = process.env.GEMINI_MODEL?.trim() || "gemini-2.0-flash";
+const DEFAULT_GEMINI_MODEL = process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash";
 
 interface NormalizedGeminiError {
 	message: string;
