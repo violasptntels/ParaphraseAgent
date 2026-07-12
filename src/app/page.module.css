@@ -1,391 +1,138 @@
 .page {
   min-height: 100vh;
-  overflow: hidden;
-  background:
-    radial-gradient(circle at top left, rgba(255, 190, 92, 0.18), transparent 32%),
-    radial-gradient(circle at top right, rgba(112, 135, 255, 0.18), transparent 28%),
-    linear-gradient(180deg, #0c1220 0%, #0f172a 45%, #111827 100%);
-  color: #f8fafc;
+  background: #0f1115;
+  color: #e5e7eb;
+  padding: 32px 24px;
 }
 
 .shell {
-  width: min(1160px, calc(100% - 24px));
+  width: 100%;
+  max-width: 960px;
   margin: 0 auto;
-  padding: 16px 0;
   display: grid;
-  gap: 12px;
-  height: 100vh;
-  box-sizing: border-box;
+  gap: 20px;
 }
 
-.hero {
+.header {
   display: grid;
-  gap: 12px;
-  padding: 18px;
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  border-radius: 22px;
-  background: rgba(15, 23, 42, 0.72);
-
-.headerRow {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
+  gap: 6px;
 }
 
-.headerRow h1 {
-  font-size: clamp(1.5rem, 2.6vw, 2.2rem);
-  margin-bottom: 6px;
+.header h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
-.headerRow p {
-  color: #cbd5e1;
+.header p {
+  color: #9ca3af;
+  font-size: 0.92rem;
   line-height: 1.5;
-  max-width: 64ch;
 }
 
-.headerStats {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  align-items: start;
 }
 
-.headerStats span,
-.modePill,
-.sampleButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999px;
-  padding: 8px 12px;
-  font-size: 0.82rem;
-  font-weight: 700;
-}
-
-.headerStats span {
-  background: rgba(15, 23, 42, 0.82);
-  border: 1px solid rgba(148, 163, 184, 0.14);
-  color: #e2e8f0;
-}
-
-.singleScreenGrid {
+.panel {
   display: grid;
   gap: 12px;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
-  min-height: 0;
-  flex: 1;
-}
-
-.panelCompact {
-  min-height: 0;
-  padding: 16px;
-  border-radius: 20px;
-  border: 1px solid rgba(148, 163, 184, 0.16);
-  background: rgba(15, 23, 42, 0.76);
-  box-shadow: 0 18px 60px rgba(2, 6, 23, 0.2);
-  display: grid;
-  gap: 10px;
-}
-
-.compactTopRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  padding: 20px;
+  border: 1px solid #1f2430;
+  border-radius: 14px;
+  background: #151822;
 }
 
 .fieldLabel {
+  font-size: 0.85rem;
   font-weight: 600;
-  color: #e2e8f0;
+  color: #cbd5e1;
+}
+
+.editorForm {
+  display: grid;
+  gap: 12px;
 }
 
 .textareaCompact {
   width: 100%;
-  min-height: 178px;
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  border-radius: 16px;
-  background: rgba(2, 6, 23, 0.58);
-  color: #f8fafc;
-  padding: 14px;
+  min-height: 260px;
+  border: 1px solid #262c3a;
+  border-radius: 10px;
+  background: #0f1115;
+  color: #e5e7eb;
+  padding: 12px 14px;
   resize: vertical;
   font: inherit;
-  line-height: 1.55;
+  line-height: 1.5;
   outline: none;
 }
 
 .textareaCompact:focus {
-  border-color: rgba(251, 191, 36, 0.55);
-  box-shadow: 0 0 0 4px rgba(251, 191, 36, 0.12);
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.18);
 }
 
-.sampleRowCompact {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.sampleButton,
-.ghostButton,
-.secondaryButton,
-.primaryButton,
-.modePill {
-  transition:
-    transform 160ms ease,
-    border-color 160ms ease,
-    background-color 160ms ease,
-    box-shadow 160ms ease;
-}
-
-.sampleButton,
-.ghostButton,
-.secondaryButton,
 .primaryButton {
-  border: 1px solid transparent;
-  border-radius: 14px;
+  justify-self: start;
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 8px;
+  background: #6366f1;
+  color: #fff;
   font: inherit;
   font-weight: 600;
   cursor: pointer;
+  transition: background-color 150ms ease, transform 150ms ease;
 }
 
-.sampleButton {
-  padding: 8px 12px;
-  background: rgba(30, 41, 59, 0.88);
-  color: #e2e8f0;
-  border-color: rgba(148, 163, 184, 0.16);
+.primaryButton:hover:not(:disabled) {
+  background: #5457e0;
 }
 
-.modeStrip {
-  display: grid;
-  gap: 8px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.modePill {
-  padding: 10px 12px;
-  border: 1px solid rgba(148, 163, 184, 0.16);
-  background: rgba(2, 6, 23, 0.48);
-  color: #e2e8f0;
-}
-
-.modePillActive {
-  border-color: rgba(251, 191, 36, 0.52);
-  background: linear-gradient(135deg, rgba(120, 53, 15, 0.48), rgba(15, 23, 42, 0.72));
-  box-shadow: 0 14px 36px rgba(251, 191, 36, 0.08);
-}
-
-.actionRowCompact {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.primaryButton,
-.secondaryButton,
-.ghostButton {
-  padding: 12px 16px;
-}
-
-.primaryButton {
-  background: linear-gradient(135deg, #f59e0b 0%, #fb7185 100%);
-  color: #111827;
-}
-
-.secondaryButton {
-  background: rgba(30, 41, 59, 0.82);
-  color: #e2e8f0;
-  border-color: rgba(148, 163, 184, 0.18);
-}
-
-.ghostButton {
-  background: transparent;
-  color: #cbd5e1;
-  border-color: rgba(148, 163, 184, 0.18);
-}
-
-.primaryButton:hover,
-.secondaryButton:hover,
-.ghostButton:hover,
-.sampleButton:hover,
-.modePill:hover {
-  transform: translateY(-1px);
-}
-
-.primaryButton:disabled,
-.ghostButton:disabled {
-  cursor: not-allowed;
+.primaryButton:disabled {
   opacity: 0.6;
-  transform: none;
+  cursor: not-allowed;
 }
 
-.statusBannerCompact {
-  padding: 10px 12px;
-  border-radius: 14px;
-  font-weight: 600;
-}
-
-.statusBannerCompact[data-status="idle"] {
-  background: rgba(59, 130, 246, 0.12);
-  color: #bfdbfe;
-}
-
-.statusBannerCompact[data-status="loading"] {
-  background: rgba(245, 158, 11, 0.14);
-  color: #fde68a;
-}
-
-.statusBannerCompact[data-status="success"] {
-  background: rgba(34, 197, 94, 0.14);
-  color: #bbf7d0;
-}
-
-.statusBannerCompact[data-status="error"] {
-  background: rgba(239, 68, 68, 0.14);
-  color: #fecaca;
+.helperText {
+  font-size: 0.82rem;
+  color: #6b7280;
 }
 
 .outputBoxCompact {
-  min-height: 140px;
+  min-height: 260px;
+  max-height: 60vh;
+  overflow-y: auto;
   padding: 14px;
-  border-radius: 16px;
-  background: rgba(2, 6, 23, 0.5);
-  border: 1px solid rgba(148, 163, 184, 0.14);
-  color: #f8fafc;
+  border-radius: 10px;
+  background: #0f1115;
+  border: 1px solid #1f2430;
+  color: #e5e7eb;
   line-height: 1.55;
   white-space: pre-wrap;
-  overflow: hidden;
 }
 
-.metaRowCompact {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  color: #cbd5e1;
-  font-size: 0.84rem;
-}
-
-.metaRowCompact span {
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.82);
-  border: 1px solid rgba(148, 163, 184, 0.12);
-}
-
-.detailsBox {
-  border-radius: 16px;
-  border: 1px solid rgba(148, 163, 184, 0.14);
-  background: rgba(15, 23, 42, 0.54);
-  padding: 10px 12px;
-}
-
-.responseToggle {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  border: 0;
-  background: transparent;
-  color: #e2e8f0;
-  font: inherit;
-  font-weight: 700;
-  cursor: pointer;
-  padding: 0;
-}
-
-.toggleState {
-  font-size: 0.8rem;
-  color: #93c5fd;
-}
-
-.responseBody {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 180ms ease;
-}
-
-.responseBodyOpen {
-  max-height: 220px;
-  overflow: auto;
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(148, 163, 184, 0.12);
-}
-
-.responseBodyOpen .codeBlockCompact {
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-.detailsBox summary {
-  cursor: pointer;
-  color: #e2e8f0;
-  font-weight: 700;
-}
-
-.codeBlockCompact {
-  margin: 0;
-  padding: 12px 0 0;
-  overflow: auto;
-  background: transparent;
-  border: 0;
-  color: #cbd5e1;
-  font-family: var(--font-geist-mono);
-  font-size: 0.84rem;
-  line-height: 1.5;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .sampleButton:hover,
-  .ghostButton:hover,
-  .secondaryButton:hover {
-    border-color: rgba(251, 191, 36, 0.28);
-  }
-
-  .primaryButton:hover {
-    box-shadow: 0 14px 40px rgba(251, 191, 36, 0.22);
-  }
-}
-
-@media (max-width: 1080px) {
-  .singleScreenGrid {
+@media (max-width: 800px) {
+  .grid {
     grid-template-columns: 1fr;
   }
-
-  .modeStrip {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
 }
 
-@media (max-width: 640px) {
-  .shell {
-    width: min(100% - 16px, 1160px);
-    padding: 10px 0;
+@media (max-width: 480px) {
+  .page {
+    padding: 20px 16px;
   }
 
-  .hero,
-  .panelCompact {
-    padding: 14px;
-    border-radius: 18px;
-  }
-
-  .headerRow,
-  .compactTopRow,
-  .actionRowCompact {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .modeStrip {
-    grid-template-columns: 1fr;
+  .panel {
+    padding: 16px;
   }
 
   .textareaCompact,
   .outputBoxCompact {
-    min-height: 122px;
-  }
-
-  .responseBodyOpen {
-    max-height: 180px;
+    min-height: 200px;
   }
 }

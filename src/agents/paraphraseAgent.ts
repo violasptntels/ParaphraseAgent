@@ -1,10 +1,6 @@
-import { buildParaphrasePrompt, type ParaphrasePromptMode } from "./promptBuilder";
+import { buildParaphrasePrompt } from "./promptBuilder";
 import { checkParaphraseQuality } from "./qualityChecker";
-import {
-	type ParaphraseMode,
-	type ParaphraseValidationInput,
-	validateParaphraseInput,
-} from "./validator";
+import { type ParaphraseValidationInput, validateParaphraseInput } from "./validator";
 import { getGeminiClient, GeminiConfigurationError } from "../lib/gemini";
 import type {
 	ParaphraseAgentOptions,
@@ -131,8 +127,7 @@ export async function paraphraseAgent(
 	options: ParaphraseAgentOptions = {},
 ): Promise<StandardizedParaphraseResponse> {
 	const validationInput: ParaphraseValidationInput = {
-		text: input.text,
-		mode: input.mode,
+		prompt: input.prompt,
 	};
 	const validation = validateParaphraseInput(validationInput);
 
@@ -141,8 +136,7 @@ export async function paraphraseAgent(
 	}
 
 	const prompt = buildParaphrasePrompt({
-		text: validation.value.text,
-		mode: validation.value.mode as ParaphrasePromptMode,
+		prompt: validation.value.prompt,
 	});
 
 	let generatedText = "";
@@ -167,7 +161,7 @@ export async function paraphraseAgent(
 	}
 
 	const quality = checkParaphraseQuality({
-		inputText: validation.value.text,
+		inputText: validation.value.prompt,
 		outputText: generatedText,
 	});
 
@@ -184,7 +178,6 @@ export async function paraphraseAgent(
 		success: true,
 		data: {
 			text: generatedText,
-			mode: validation.value.mode as ParaphraseMode,
 		},
 		validation,
 		quality,

@@ -27,7 +27,7 @@ flowchart TD
   - Orchestrates the full paraphrase flow
   - Validates input, builds the prompt, calls Gemini, runs quality checks, and returns a standardized response
 - `src/agents/validator.ts`
-  - Validates required text, min/max length, and supported paraphrase modes
+  - Validates the prompt and its min/max length
 - `src/agents/promptBuilder.ts`
   - Builds optimized Gemini prompts
   - Preserves citations and technical terms
@@ -45,23 +45,13 @@ flowchart TD
 
 Paraphrases text using Gemini.
 
-#### Supported modes
-
-- `academic`
-- `formal`
-- `casual`
-- `humanize`
-- `expand`
-- `shorten`
-
 #### Request
 
 Send JSON with the following shape:
 
 ```json
 {
-  "text": "Original text to paraphrase.",
-  "mode": "formal"
+  "prompt": "Original text to paraphrase. Tolong parafrase menjadi bahasa akademik."
 }
 ```
 
@@ -73,14 +63,12 @@ On success, the API returns the standardized paraphrase payload:
 {
   "success": true,
   "data": {
-    "text": "Rewritten text from Gemini.",
-    "mode": "formal"
+    "text": "Rewritten text from Gemini."
   },
   "validation": {
     "valid": true,
     "value": {
-      "text": "Original text to paraphrase.",
-      "mode": "formal"
+      "prompt": "Original text to paraphrase. Tolong parafrase menjadi bahasa akademik."
     },
     "errors": []
   },
@@ -110,9 +98,9 @@ Example validation failure:
     "message": "Input validation failed.",
     "details": [
       {
-        "field": "text",
+        "field": "prompt",
         "code": "required",
-        "message": "Text is required."
+        "message": "Prompt is required."
       }
     ]
   }
@@ -121,11 +109,10 @@ Example validation failure:
 
 ## Request Rules
 
-The input text must satisfy all of the following:
+The input prompt must satisfy all of the following:
 
-- `text` is required
-- `text` must be within the configured minimum and maximum length
-- `mode` must be one of the supported paraphrase modes
+- `prompt` is required
+- `prompt` must be within the configured minimum and maximum length
 
 The prompt builder also preserves:
 
@@ -154,7 +141,6 @@ npm install
 
 ```env
 GEMINI_API_KEY=your_gemini_api_key_here
-GEMINI_MODEL=gemini-2.0-flash
 GEMINI_MODEL=gemini-2.5-flash
 ```
 

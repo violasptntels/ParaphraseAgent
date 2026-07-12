@@ -1,16 +1,14 @@
-import type { ParaphraseMode, ValidationResult, ValidatedParaphraseInput } from "../agents/validator";
+import type { ValidationResult, ValidatedParaphraseInput } from "../agents/validator";
 import type { QualityCheckIssue, QualityCheckResult } from "../agents/qualityChecker";
 
 export interface ParaphraseRequest {
-	text: string;
-	mode: ParaphraseMode;
+	prompt: string;
 }
 
 export interface ParaphraseResponse {
 	success: true;
 	data: {
 		text: string;
-		mode: ParaphraseMode;
 	};
 	validation: ValidationResult<ValidatedParaphraseInput>;
 	quality: QualityCheckResult;
@@ -35,6 +33,5 @@ export interface ParaphraseAgentOptions {
 
 export interface ParaphraseAgentSuccess {
 	text: string;
-	mode: ParaphraseMode;
 	qualityIssues: QualityCheckIssue[];
 }

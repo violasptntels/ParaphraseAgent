@@ -1,24 +1,12 @@
-export const VALID_PARAPHRASE_MODES = [
-	"academic",
-	"formal",
-	"casual",
-	"humanize",
-	"expand",
-	"shorten",
-] as const;
-
-export type ParaphraseMode = (typeof VALID_PARAPHRASE_MODES)[number];
-
 export interface ParaphraseValidationInput {
-	text?: string;
-	mode?: string;
+	prompt?: string;
 	minLength?: number;
 	maxLength?: number;
 }
 
 export interface ValidationIssue {
-	field: "text" | "mode";
-	code: "required" | "minLength" | "maxLength" | "invalidMode";
+	field: "prompt";
+	code: "required" | "minLength" | "maxLength" | "invalidIntent";
 	message: string;
 }
 
@@ -37,56 +25,82 @@ export interface ValidationFailure {
 export type ValidationResult<T> = ValidationSuccess<T> | ValidationFailure;
 
 export interface ValidatedParaphraseInput {
-	text: string;
-	mode: ParaphraseMode;
+	prompt: string;
 }
 
 const DEFAULT_MIN_LENGTH = 1;
 const DEFAULT_MAX_LENGTH = 5000;
 
-function isParaphraseMode(mode: string): mode is ParaphraseMode {
-	return (VALID_PARAPHRASE_MODES as readonly string[]).includes(mode);
+const PARAPHRASE_INTENT_PATTERNS = [
+	/\bparaphrase\b/i,
+	/\bparafrase\b/i,
+	/\brephrase\b/i,
+	/\brewrite\b/i,
+	/\bubah\s+kata\b/i,
+	/\bubah\s+susunan\s+kata\b/i,
+];
+
+const DISALLOWED_INTENT_PATTERNS = [
+	/\btranslate\b/i,
+	/\bterjemah(?:kan)?\b/i,
+	/\bsummar(?:y|ize|ise)\b/i,
+	/\bringk(?:as|asan)\b/i,
+	/\bexplain\b/i,
+	/\bjelaskan\b/i,
+	/\bconvert\b/i,
+	/\bgenerate\b/i,
+	/\banswer\b/i,
+	/\bjawab\b/i,
+	/\bexpand\b/i,
+	/\bshorten\b/i,
+];
+
+function hasParaphraseIntent(prompt: string): boolean {
+	return PARAPHRASE_INTENT_PATTERNS.some((pattern) => pattern.test(prompt));
+}
+
+function hasDisallowedIntent(prompt: string): boolean {
+	return DISALLOWED_INTENT_PATTERNS.some((pattern) => pattern.test(prompt));
 }
 
 export function validateParaphraseInput(
 	input: ParaphraseValidationInput,
 ): ValidationResult<ValidatedParaphraseInput> {
 	const errors: ValidationIssue[] = [];
-	const text = input.text?.trim() ?? "";
-	const mode = input.mode?.trim() ?? "";
+	const prompt = input.prompt?.trim() ?? "";
 	const minLength = input.minLength ?? DEFAULT_MIN_LENGTH;
 	const maxLength = input.maxLength ?? DEFAULT_MAX_LENGTH;
 
-	if (!text) {
+	if (!prompt) {
 		errors.push({
-			field: "text",
+			field: "prompt",
 			code: "required",
-			message: "Text is required.",
+			message: "Prompt is required.",
 		});
 	} else {
-		if (text.length < minLength) {
+		if (prompt.length < minLength) {
 			errors.push({
-				field: "text",
+				field: "prompt",
 				code: "minLength",
-				message: `Text must be at least ${minLength} characters long.`,
+				message: `Prompt must be at least ${minLength} characters long.`,
 			});
 		}
 
-		if (text.length > maxLength) {
+		if (prompt.length > maxLength) {
 			errors.push({
-				field: "text",
+				field: "prompt",
 				code: "maxLength",
-				message: `Text must be no more than ${maxLength} characters long.`,
+				message: `Prompt must be no more than ${maxLength} characters long.`,
 			});
 		}
-	}
 
-	if (!mode || !isParaphraseMode(mode)) {
-		errors.push({
-			field: "mode",
-			code: "invalidMode",
-			message: `Mode must be one of: ${VALID_PARAPHRASE_MODES.join(", ")}.`,
-		});
+		if (!hasParaphraseIntent(prompt) || hasDisallowedIntent(prompt)) {
+			errors.push({
+				field: "prompt",
+				code: "invalidIntent",
+				message: "Prompt must ask only for paraphrasing. Translation or other tasks are not supported.",
+			});
+		}
 	}
 
 	if (errors.length > 0) {
@@ -100,8 +114,7 @@ export function validateParaphraseInput(
 	return {
 		valid: true,
 		value: {
-			text,
-			mode: mode as ParaphraseMode,
+			prompt,
 		},
 		errors: [],
 	};
