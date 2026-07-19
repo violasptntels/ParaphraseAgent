@@ -1,170 +1,103 @@
-# Paraphrase Agent
+# PARAPHRASE AGENT API
 
-Paraphrase Agent is a Next.js 15 + TypeScript application that exposes a modular AI paraphrasing backend through a single Route Handler. The current architecture is intentionally split into small, testable layers so the prompt logic, validation, Gemini integration, and quality checks stay isolated.
+Paraphrase Agent adalah layanan AI berbasis microservice yang dirancang sebagai bagian dari ekosistem Multi-Agent System (MAS) "Joki Tugas AI". Agen ini menggunakan Gemini AI untuk melakukan penulisan ulang (*rewriting*), restrukturisasi sintaksis, dan penyesuaian tingkat formalitas teks secara otomatis melalui pipeline yang *type-safe* dan terstandardisasi dengan Orchestrator.
 
-## Architecture
+## Fitur Utama
+* **Contextual Rewriting**: Mampu mendeteksi intensi gaya bahasa akademik, formal, maupun kasual secara langsung dari instruksi pengguna.
+* **Similarity & Plagiarism Guard**: Dilengkapi dengan pengecekan kualitas internal untuk memastikan hasil penulisan ulang memiliki variasi struktur yang cukup dibanding teks asli.
+* **Orchestrator Compliant**: Mendukung CORS penuh dan pemetaan HTTP Status Code yang dinamis untuk kelancaran komunikasi dalam pipeline MAS.
 
-The backend is organized around a pure orchestration flow:
+---
 
-```mermaid
-flowchart TD
-  A[POST /api/paraphrase] --> B[Route Handler]
-  B --> C[paraphraseAgent]
-  C --> D[validator]
-  C --> E[promptBuilder]
-  C --> F[Gemini client]
-  C --> G[qualityChecker]
-  F --> H[Gemini API]
-  G --> I[standardized response]
-```
-
-### Layers
-
-- `src/app/api/paraphrase/route.ts`
-  - Next.js Route Handler for `POST /api/paraphrase`
-  - Reads JSON, calls the agent, and maps standardized results to HTTP responses
-- `src/agents/paraphraseAgent.ts`
-  - Orchestrates the full paraphrase flow
-  - Validates input, builds the prompt, calls Gemini, runs quality checks, and returns a standardized response
-- `src/agents/validator.ts`
-  - Validates the prompt and its min/max length
-- `src/agents/promptBuilder.ts`
-  - Builds optimized Gemini prompts
-  - Preserves citations and technical terms
-- `src/lib/gemini.ts`
-  - Reusable Gemini client wrapper
-  - Reads `GEMINI_API_KEY` from `.env.local`
-- `src/agents/qualityChecker.ts`
-  - Checks generated output for basic quality constraints
-- `src/types/api.ts`
-  - Shared request and response types
-
-## API
+## API Endpoints Contract
 
 ### `POST /api/paraphrase`
 
-Paraphrases text using Gemini.
+Mengirimkan permintaan parafrase teks ke Paraphrase Agent. Endpoint ini mewajibkan kepatuhan terhadap struktur payload Orchestrator.
 
-#### Request
+#### Request Headers
+| Key | Value | Wajib |
+| :--- | :--- | :--- |
+| `Content-Type` | `application/json` | Ya |
 
-Send JSON with the following shape:
+#### Request Body
+Kirimkan *payload* dalam format JSON dengan struktur sebagai berikut:
 
+| Key | Tipe | Wajib | Deskripsi |
+| :--- | :--- | :--- | :--- |
+| `task_id` | `string` | Ya | ID unik untuk mengidentifikasi tugas/proses di level Orchestrator. |
+| `agent_type` | `string` | Ya | Harus bernilai `"paraphrase"`. |
+| `payload` | `object` | Ya | Objek kontainer data utama. |
+| `payload.raw_text` | `string` | Ya | Teks instruksi lengkap yang berisi kalimat sumber beserta perintah gaya parafrasenya. |
+
+**Contoh Request Payload:**
 ```json
 {
-  "prompt": "Original text to paraphrase. Tolong parafrase menjadi bahasa akademik."
+  "task_id": "task-1718923999",
+  "agent_type": "paraphrase",
+  "payload": {
+    "raw_text": "saya mau mengumpulkan tugas besok tapi belum selesai, tolong parafrase menjadi bahasa akademik."
+  }
 }
 ```
 
-#### Response
-
-On success, the API returns the standardized paraphrase payload:
-
-```json
+## Response Structure
+***1. Response Success (200 OK)***
+```json 
 {
-  "success": true,
+  "status": "success",
+  "task_id": "task-1718923999",
   "data": {
-    "text": "Rewritten text from Gemini."
+    "result": "Terdapat kewajiban untuk menyerahkan tugas pada hari esok, meskipun proses penyelesaiannya saat ini belum mencapai tahap final.",
+    "file_url": null
   },
-  "validation": {
-    "valid": true,
-    "value": {
-      "prompt": "Original text to paraphrase. Tolong parafrase menjadi bahasa akademik."
-    },
-    "errors": []
-  },
-  "quality": {
-    "passed": true,
-    "issues": []
-  }
-}
-```
-
-#### Error responses
-
-The route returns standardized errors with HTTP status codes mapped as follows:
-
-- `400` - validation error or invalid JSON body
-- `422` - quality check failure
-- `502` - Gemini client or model error
-- `500` - unexpected error
-
-Example validation failure:
-
-```json
-{
-  "success": false,
-  "error": {
-    "code": "validation_error",
-    "message": "Input validation failed.",
-    "details": [
-      {
-        "field": "prompt",
-        "code": "required",
-        "message": "Prompt is required."
+  "message": "Paraphrase processed successfully.",
+  "meta": {
+    "validation": {
+      "valid": true,
+      "value": {
+        "prompt": "saya mau mengumpulkan tugas besok tapi belum selesai, tolong parafrase menjadi bahasa akademik."
       }
-    ]
+    },
+    "quality": {
+      "passed": true,
+      "issues": []
+    }
   }
 }
 ```
 
-## Request Rules
-
-The input prompt must satisfy all of the following:
-
-- `prompt` is required
-- `prompt` must be within the configured minimum and maximum length
-
-The prompt builder also preserves:
-
-- citations
-- URLs
-- reference markers
-- technical terms such as APIs, libraries, identifiers, acronyms, version numbers, and file paths
-
-## Installation
-
-### Prerequisites
-
-- Node.js 20+ recommended
-- npm
-- A valid Gemini API key
-
-### Setup
-
-1. Install dependencies:
-
-```bash
-npm install
+***2. Response Error (400 Bad Request)***
+```json 
+{
+  "status": "error",
+  "task_id": "task-1718923999",
+  "data": null,
+  "message": "Input validation failed. Missing required fields or prompt criteria not met.",
+  "meta": {
+    "validation": {
+      "valid": false,
+      "errors": ["Missing required field: payload.raw_text"]
+    }
+  }
+}
 ```
 
-2. Create `.env.local` in the project root:
-
-```env
-GEMINI_API_KEY=your_gemini_api_key_here
-GEMINI_MODEL=gemini-2.5-flash
+***3. Response Error (422 Unprocessable Entity)***
+```json 
+{
+  "status": "error",
+  "task_id": "task-1718923999",
+  "data": null,
+  "message": "Generated output did not pass quality checks.",
+  "meta": {
+    "validation": {
+      "valid": true
+    },
+    "quality": {
+      "passed": false,
+      "issues": ["Output similarity index is above acceptable threshold"]
+    }
+  }
+}
 ```
-
-3. Start the development server:
-
-```bash
-npm run dev
-```
-
-4. Open the app in your browser:
-
-```text
-http://localhost:3000
-```
-
-### Scripts
-
-- `npm run dev` - start the development server
-- `npm run build` - build the application
-- `npm run start` - start the production server
-- `npm run lint` - run ESLint
-
-## Notes
-
-- The Gemini client is created through `src/lib/gemini.ts` and will throw a clear configuration error if `GEMINI_API_KEY` is missing.
-- The API layer does not contain business logic; it only handles HTTP input and output.
-- The orchestration logic stays inside `src/agents/paraphraseAgent.ts` so it can be reused outside the route handler later.

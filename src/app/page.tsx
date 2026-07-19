@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import type { StandardizedParaphraseResponse } from "../types/api";
+// Impor type response asli dari agent agar selaras
+import type { OrchestratorParaphraseResponse } from "../agents/paraphraseAgent"; 
 import styles from "./page.module.css";
 
 const INITIAL_PROMPT = "This paraphrase tool helps you rewrite text while keeping the meaning intact. Tolong parafrase menjadi bahasa akademik.";
@@ -25,17 +26,25 @@ export default function Home() {
       const result = await fetch("/api/paraphrase", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: trimmedPrompt }),
+        // Kuncinya di sini: Sesuaikan dengan Orchestrator API Contract
+        body: JSON.stringify({
+          task_id: `task-${Date.now()}`, // Generate id unik sementara untuk testing
+          agent_type: "paraphrase",
+          payload: {
+            raw_text: trimmedPrompt
+          }
+        }),
       });
 
-      const data = (await result.json()) as StandardizedParaphraseResponse;
+      const data = (await result.json()) as OrchestratorParaphraseResponse;
 
-      if (data.success) {
-        setOutput(data.data.text);
+      // Sesuaikan pembacaan property berdasarkan contract backend
+      if (data.status === "success" && data.data) {
+        setOutput(data.data.result || "Tidak ada hasil teks yang dikembalikan.");
         return;
       }
 
-      setOutput(data.error.message);
+      setOutput(data.message || "Gagal memproses parafrase.");
     } catch (error) {
       setOutput(error instanceof Error ? error.message : "Terjadi kesalahan tak terduga.");
     } finally {
